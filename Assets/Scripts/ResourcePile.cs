@@ -11,6 +11,8 @@ public class ResourcePile : Building
     private float m_BaseProductionSpeed = 0.5f;
     private float m_ProductionSpeed = 0.5f;
     public float ProductionSpeed => m_ProductionSpeed;
+    // => means a Read only property or equivalent to 'Get { return m_ProductionSpeed; }'
+
 
     private HashSet<ProductivityUnit> productivityUnits = new();
 

@@ -3,31 +3,22 @@ using UnityEngine;
 public class ProductivityUnit : Unit
 {
     ResourcePile currentPile = null;
-    public float productivityMultiplier = 2;
-
-    private static int m_ProductivityUnits = 0;
-    public static int ProductivityUnits
-    {
-        get => m_ProductivityUnits;
-        private set
-        {
-            m_ProductivityUnits = value;
-        }
-    }
+    public float productivityMultiplier = 2f;
 
     protected override void BuildingInRange()
     {
-        if (currentPile == null)
-        {
-            ResourcePile pile = m_Target as ResourcePile;
+        ResourcePile pile = m_Target as ResourcePile;
 
-            if (pile != null)
+        if (pile != null && currentPile != pile)
+        {
+            // If we are in range of a resource pile, we increase the productivity of the pile
+            if (currentPile != null)
             {
-                // If we are in range of a resource pile, we increase the productivity of the pile
-                currentPile = pile;
-                pile.ProductionSpeed *= productivityMultiplier;
-                ProductivityUnits++;
+                currentPile.UnregisterProductivityUnit(this);
             }
+
+            currentPile = pile;
+            currentPile.RegisterProductivityUnit(this);
         }
     }
 
@@ -36,8 +27,7 @@ public class ProductivityUnit : Unit
         if (currentPile != null)
         {
             // If we were in range of a resource pile and now we are not, we reset the productivity
-            ProductivityUnits--;
-            currentPile.ProductionSpeed /= productivityMultiplier;
+            currentPile.UnregisterProductivityUnit(this);
             currentPile = null;
         }
     }
@@ -53,4 +43,10 @@ public class ProductivityUnit : Unit
         ResetProductivity();
         base.GoTo(position);
     }
+
+    private void OnDisable()
+    {
+        ResetProductivity();
+    }
 }
+

@@ -13,7 +13,6 @@ public class ResourcePile : Building
     public float ProductionSpeed => m_ProductionSpeed;
     // => means a Read only property or equivalent to 'Get { return m_ProductionSpeed; }'
 
-
     private HashSet<ProductivityUnit> productivityUnits = new();
 
     public void RegisterProductivityUnit(ProductivityUnit unit)
@@ -39,6 +38,7 @@ public class ResourcePile : Building
         foreach (var unit in productivityUnits)
         {
             speed *= unit.productivityMultiplier;
+            Debug.Log($"Productivity unit found: {unit.name}, multiplier: {unit.productivityMultiplier}");
         }
 
         m_ProductionSpeed = Mathf.Min(speed, 10.0f); // Cap the production speed at 10.0f
@@ -65,6 +65,5 @@ public class ResourcePile : Building
     public override string GetData()
     {
         return $"Producing at the speed of {ProductionSpeed}/s";
-        
     }
 }

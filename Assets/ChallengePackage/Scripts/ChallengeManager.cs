@@ -1,6 +1,6 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 
 public class ChallengeManager : MonoBehaviour
 {
@@ -8,7 +8,8 @@ public class ChallengeManager : MonoBehaviour
     public int LineCount = 6;
     public Rigidbody Ball;
 
-    public Text ScoreText;
+    public TextMeshProUGUI ScoreText;
+    public TextMeshProUGUI BestScoreText;
     public GameObject GameOverText;
     
     private bool m_Started = false;
@@ -57,6 +58,12 @@ public class ChallengeManager : MonoBehaviour
             {
                 SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
             }
+
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                // Exit to main menu
+                SceneManager.LoadScene("challenge_menu");
+            }
         }
     }
 
@@ -70,5 +77,17 @@ public class ChallengeManager : MonoBehaviour
     {
         m_GameOver = true;
         GameOverText.SetActive(true);
+        if (BestScore.Instance == null)
+        {
+            Debug.LogError("BestScore instance is not initialized.");
+            return;
+        }
+        if (m_Points > BestScore.Instance.highScore.Score)
+        {
+            BestScore.Instance.highScore.Score = m_Points;
+            BestScore.Instance.highScore.Name = BestScore.Instance.playerName;
+            BestScore.Instance.SaveHighScore();
+            BestScoreText.text = $"Best Score : {BestScore.Instance.highScore.Name} : {BestScore.Instance.highScore.Score}";
+        }
     }
 }

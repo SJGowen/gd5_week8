@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 
 public class ChallengeMenu : MonoBehaviour
 {
-    public TextMeshProUGUI playerName;
+    public TMP_InputField playerName;
 
     private void Start()
     {
@@ -17,18 +17,18 @@ public class ChallengeMenu : MonoBehaviour
             Debug.LogError("BestScore instance is not initialized.");
             return;
         }
-        BestScore.Instance.LoadHighScore();
     }
 
     public void StartGame()
     {
-        string currentPlayer = playerName.text.Trim();
-        if (string.IsNullOrEmpty(currentPlayer))
+        string currentPlayer = playerName.text;
+        if (string.IsNullOrWhiteSpace(currentPlayer))
         {
             currentPlayer = "Anonymous";
         }
-        
-        BestScore.Instance.playerName = currentPlayer;
+
+        // Store the player name in case they beet the high score
+        BestScore.Instance.CurrentPlayerName = currentPlayer;
 
         SceneManager.LoadScene("challenge_main");
     }

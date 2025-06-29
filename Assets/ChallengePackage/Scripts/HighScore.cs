@@ -6,7 +6,7 @@ public class HighScore
 
     public HighScore(string name, int score)
     {
-        Name = string.IsNullOrEmpty(name) ? "Anonymous" : name;
+        Name = string.IsNullOrWhiteSpace(name) ? "Anonymous" : name;
         Score = score < 0 ? 0 : score;
     }
 }

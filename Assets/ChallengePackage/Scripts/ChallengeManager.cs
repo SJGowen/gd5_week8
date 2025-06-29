@@ -8,19 +8,20 @@ public class ChallengeManager : MonoBehaviour
     public int LineCount = 6;
     public Rigidbody Ball;
 
-    public TextMeshProUGUI ScoreText;
-    public TextMeshProUGUI BestScoreText;
+    [SerializeField]
+    private TMP_Text ScoreText;
+    [SerializeField]
+    private TMP_Text BestScoreText;
     public GameObject GameOverText;
     
     private bool m_Started = false;
     private int m_Points;
-    
     private bool m_GameOver = false;
 
-    
     // Start is called before the first frame update
     void Start()
     {
+        BestScoreText.text = BestScore.Instance.GetBestScore(BestScore.Instance.highScore);
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
         
@@ -46,11 +47,16 @@ public class ChallengeManager : MonoBehaviour
                 m_Started = true;
                 float randomDirection = Random.Range(-1.0f, 1.0f);
                 Vector3 forceDir = new Vector3(randomDirection, 1, 0);
-                forceDir.Normalize();
+                forceDir.Normalize(); 
 
                 Ball.transform.SetParent(null);
                 Ball.AddForce(forceDir * 0.5f, ForceMode.Impulse);
             }
+        }
+        else if (Input.GetKeyDown(KeyCode.Q))
+        {
+            Destroy(Ball.gameObject);
+            GameOver();
         }
         else if (m_GameOver)
         {
@@ -76,18 +82,14 @@ public class ChallengeManager : MonoBehaviour
     public void GameOver()
     {
         m_GameOver = true;
-        GameOverText.SetActive(true);
-        if (BestScore.Instance == null)
-        {
-            Debug.LogError("BestScore instance is not initialized.");
-            return;
-        }
+        Debug.Log($"Game Over! Final Score: {m_Points} for {BestScore.Instance.CurrentPlayerName}.");
         if (m_Points > BestScore.Instance.highScore.Score)
         {
-            BestScore.Instance.highScore.Score = m_Points;
-            BestScore.Instance.highScore.Name = BestScore.Instance.playerName;
-            BestScore.Instance.SaveHighScore();
+            BestScore.Instance.SaveHighScore(BestScore.Instance.CurrentPlayerName, m_Points);
             BestScoreText.text = $"Best Score : {BestScore.Instance.highScore.Name} : {BestScore.Instance.highScore.Score}";
+            Debug.Log($"New high score set: {BestScore.Instance.highScore.Name} with {BestScore.Instance.highScore.Score} points.");
         }
+
+        GameOverText.SetActive(true);
     }
 }

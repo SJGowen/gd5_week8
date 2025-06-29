@@ -6,9 +6,35 @@ public class BestScore : MonoBehaviour
 {
     public static BestScore Instance { get; private set; }
     public HighScore highScore;
-    public string playerName = "Anonymous";
+    private string _currentPlayerName;
+    public string CurrentPlayerName
+    {
+        get => string.IsNullOrWhiteSpace(_currentPlayerName) ? "Anonymous" : _currentPlayerName;
+        set
+        {
+            _currentPlayerName = string.IsNullOrWhiteSpace(value) ? "Anonymous" : value;
+            Debug.Log($"Current Player Name set to: {_currentPlayerName}");
+        }
+    }
 
-    public TextMeshProUGUI bestScore;
+    public TMP_Text bestScore;
+
+    public string GetBestScore(HighScore highScore)
+    {
+        return $"Best Score : {highScore.Name} : {highScore.Score}";
+    }
+
+    private void DisplayBestScore(HighScore highScore)
+    {
+        if (bestScore != null)
+        {
+            bestScore.text = GetBestScore(highScore);
+        }
+        else
+        {
+            Debug.LogWarning("Best Score Text is not assigned.");
+        }
+    }
 
     private void Awake()
     {
@@ -16,6 +42,7 @@ public class BestScore : MonoBehaviour
         Debug.Log("BestScore Awake called");
         if (Instance != null)
         {
+            Debug.Log("BestScore Awake methood, about to Destroy(gameObject).");
             Destroy(gameObject);
         }
 
@@ -23,30 +50,19 @@ public class BestScore : MonoBehaviour
         DontDestroyOnLoad(gameObject);
 
         LoadHighScore();
-        highScore ??= new HighScore(playerName, 0);
+        if (highScore == null)
+        {
+            Debug.LogWarning("HighScore is null, initializing with default values.");
+            highScore = new HighScore(CurrentPlayerName, 0);
+        }
     }
 
-    [System.Serializable]
-    class SaveData
-    {
-        public string Name;
-        public int Score;
-    }
-
-    private void DisplayBestScore(HighScore highScore)
-    {
-        bestScore.text = $"Best Score : {highScore.Name} : {highScore.Score}";
-    }
-
-
-    public void SaveHighScore()
+    public void SaveHighScore(string playerName, int score)
     {
         Debug.Log($"Saving High Score: {highScore}");
-        SaveData data = new SaveData();
-        data.Name = highScore.Name;
-        data.Score = highScore.Score;
+        highScore = new HighScore(playerName, score);
 
-        string jsonData = JsonUtility.ToJson(data);
+        string jsonData = JsonUtility.ToJson(highScore);
         string pathName = Path.Combine(Application.persistentDataPath, "breakout.json");
         Debug.Log($"Saving to path: {pathName.Replace("/", "\\")}");
         File.WriteAllText(pathName, jsonData);
@@ -60,9 +76,8 @@ public class BestScore : MonoBehaviour
         if (File.Exists(pathName))
         {
             string jsonData = File.ReadAllText(pathName);
-            SaveData data = JsonUtility.FromJson<SaveData>(jsonData);
+            HighScore data = JsonUtility.FromJson<HighScore>(jsonData);
             highScore = new HighScore(data.Name, data.Score);
-
         }
         else
         {

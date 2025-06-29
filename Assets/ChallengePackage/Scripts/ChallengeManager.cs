@@ -1,3 +1,4 @@
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -21,7 +22,7 @@ public class ChallengeManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        BestScoreText.text = BestScore.Instance.GetBestScore(BestScore.Instance.highScore);
+        BestScoreText.text = BestScore.Instance.GetBestScoreText(BestScore.Instance.highScores);
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
         
@@ -83,11 +84,13 @@ public class ChallengeManager : MonoBehaviour
     {
         m_GameOver = true;
         Debug.Log($"Game Over! Final Score: {m_Points} for {BestScore.Instance.CurrentPlayerName}.");
-        if (m_Points > BestScore.Instance.highScore.Score)
+        // Only add if it's a high score or if there are less than 10 scores
+        if (BestScore.Instance.highScores.Count < 10 ||
+            m_Points > BestScore.Instance.highScores.Last().Score)
         {
             BestScore.Instance.SaveHighScore(BestScore.Instance.CurrentPlayerName, m_Points);
-            BestScoreText.text = $"Best Score : {BestScore.Instance.highScore.Name} : {BestScore.Instance.highScore.Score}";
-            Debug.Log($"New high score set: {BestScore.Instance.highScore.Name} with {BestScore.Instance.highScore.Score} points.");
+            BestScoreText.text = BestScore.Instance.GetBestScoreText(BestScore.Instance.highScores);
+            Debug.Log($"New high score set: {BestScore.Instance.highScores[0].Name} with {BestScore.Instance.highScores[0].Score} points.");
         }
 
         GameOverText.SetActive(true);

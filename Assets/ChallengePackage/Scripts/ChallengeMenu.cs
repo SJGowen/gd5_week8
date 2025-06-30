@@ -1,4 +1,3 @@
-using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -12,7 +11,7 @@ public class ChallengeMenu : MonoBehaviour
     private void Start()
     {
         // Ensure that the BestScore instance is created and loaded
-        if (BestScore.Instance == null)
+        if (BestScoreSingleton.Instance == null)
         {
             Debug.LogError("BestScore instance is not initialized.");
             return;
@@ -28,7 +27,7 @@ public class ChallengeMenu : MonoBehaviour
         }
 
         // Store the player name in case they beet the high score
-        BestScore.Instance.CurrentPlayerName = currentPlayer;
+        BestScoreSingleton.Instance.SetPlayerName(currentPlayer);
 
         SceneManager.LoadScene("challenge_main");
     }

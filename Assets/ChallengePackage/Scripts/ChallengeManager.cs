@@ -11,7 +11,7 @@ public class ChallengeManager : MonoBehaviour
     [SerializeField]
     private TMP_Text ScoreText;
     [SerializeField]
-    private TMP_Text BestScoreText;
+    private TMP_Text bestScore;
     public GameObject GameOverText;
     
     private bool m_Started = false;
@@ -21,7 +21,6 @@ public class ChallengeManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        BestScoreText.text = BestScore.Instance.GetBestScore(BestScore.Instance.highScore);
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
         
@@ -82,13 +81,7 @@ public class ChallengeManager : MonoBehaviour
     public void GameOver()
     {
         m_GameOver = true;
-        Debug.Log($"Game Over! Final Score: {m_Points} for {BestScore.Instance.CurrentPlayerName}.");
-        if (m_Points > BestScore.Instance.highScore.Score)
-        {
-            BestScore.Instance.SaveHighScore(BestScore.Instance.CurrentPlayerName, m_Points);
-            BestScoreText.text = $"Best Score : {BestScore.Instance.highScore.Name} : {BestScore.Instance.highScore.Score}";
-            Debug.Log($"New high score set: {BestScore.Instance.highScore.Name} with {BestScore.Instance.highScore.Score} points.");
-        }
+        BestScoreSingleton.Instance.RecordScore(m_Points);
 
         GameOverText.SetActive(true);
     }
